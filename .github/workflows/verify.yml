@@ -42,38 +42,39 @@ jobs:
           python3 scripts/validate_morphe_metadata.py
       - name: Build Morphe patch and index
         run: bash ./gradlew :patches:generatePatchesList --no-daemon
-      - name: Verify output
+      - name: Verify five-patch experimental bundle without changing published manifest
         run: |
-          # Released v0.2.0 metadata is immutable; the generated experimental index
-          # has a fourth patch and is not published to the v0.2.0 release.
-          python3 scripts/validate_morphe_bundle.py
-          test -s patches/build/libs/patches-0.2.0.mpp
           python3 - <<'PY'
-          import json
+          import json, hashlib
           from pathlib import Path
-          metadata = json.loads(Path("patches-list.json").read_text())
-          assert metadata["version"] == "0.2.0", metadata["version"]
-          assert len(metadata["patches"]) == 4
-          assert {p["name"] for p in metadata["patches"]} == {
+          from scripts.validate_morphe_bundle import validate_morphe_bundle
+          version = next(line.split("=", 1)[1].strip() for line in Path("gradle.properties").read_text().splitlines() if line.strip().startswith("version ="))
+          assert version == "0.2.1-dev.2", version
+          bundle = Path(f"patches/build/libs/patches-{version}.mpp")
+          validate_morphe_bundle(bundle)
+          index = json.loads(Path("patches-list.json").read_text(encoding="utf-8"))
+          assert index["version"] == version
+          patches = index["patches"]
+          assert len(patches) == 5
+          assert {p["name"] for p in patches} == {
               "Permanently hide donation banner",
               "Enable local settings export (experimental)",
               "Enable local Pro features (experimental)",
               "Enable OAuth setup in re-signed FairEmail (experimental)",
+              "Suppress automatic changelog popup",
           }
-          for patch in metadata["patches"]:
+          for patch in patches:
               package, = patch["compatiblePackages"]
               assert package["packageName"] == "eu.faircode.email"
-              if patch["name"].startswith("Enable OAuth setup"):
-                  assert [t["version"] for t in package["targets"]] == ["1.2338"]
-                  assert sorted(package["targets"][0]["versionCodes"].values()) == [2338] * 4
-              else:
-                  assert [t["version"] for t in package["targets"]] == ["1.2337", "1.2338"]
-                  assert sorted(package["targets"][0]["versionCodes"].values()) == [2337] * 4
-                  assert sorted(package["targets"][1]["versionCodes"].values()) == [2338] * 4
-          print("Patch/index metadata verification: PASS")
+              one_version = patch["name"].startswith("Enable OAuth setup") or patch["name"] == "Suppress automatic changelog popup"
+              versions = [t["version"] for t in package["targets"]]
+              assert versions == (["1.2338"] if one_version else ["1.2337", "1.2338"])
+              assert patch["default"] is (patch["name"] in {"Permanently hide donation banner", "Suppress automatic changelog popup"})
+          print("FairEmail experimental five-patch metadata and Android MPP: PASS")
+          print("MPP_SHA256", hashlib.sha256(bundle.read_bytes()).hexdigest())
           PY
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fairemail-patches-oauth-experimental
-          path: patches/build/libs/patches-0.2.0.mpp
+          name: fairemail-patches-changelog-experimental
+          path: patches/build/libs/patches-0.2.1-dev.2.mpp
