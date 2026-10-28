@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      VERSION: 0.2.1-dev.1
+      VERSION: 0.2.1-dev.2
     steps:
       - name: Checkout dev branch
         uses: actions/checkout@v4
@@ -51,38 +51,39 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           version = next(line.split('=', 1)[1].strip() for line in Path('gradle.properties').read_text().splitlines() if line.strip().startswith('version ='))
-          assert version == "0.2.1-dev.1", version
+          assert version == "0.2.1-dev.2", version
           print("Dev version bump: PASS")
           PY
       - name: Build Android loadable experimental patch bundle and metadata index
         run: bash ./gradlew :patches:generatePatchesList --no-daemon
-      - name: Verify generated OAuth MPP and exact four-patch index
+      - name: Verify generated OAuth + changelog MPP and exact five-patch index
         run: |
           python3 - <<'PY'
           import json, hashlib, zipfile
           from pathlib import Path
           from scripts.validate_morphe_bundle import validate_morphe_bundle
-          version = "0.2.1-dev.1"
+          version = "0.2.1-dev.2"
           path = Path(f"patches/build/libs/patches-{version}.mpp")
           assert path.is_file() and path.stat().st_size > 1000
           validate_morphe_bundle(path)
           index = json.loads(Path("patches-list.json").read_text(encoding="utf-8"))
           assert index["version"] == version
           patches = index["patches"]
-          assert len(patches) == 4, len(patches)
+          assert len(patches) == 5, len(patches)
           names = {p["name"] for p in patches}
           assert names == {
               "Permanently hide donation banner",
               "Enable local settings export (experimental)",
               "Enable local Pro features (experimental)",
               "Enable OAuth setup in re-signed FairEmail (experimental)",
+              "Suppress automatic changelog popup",
           }, names
           for patch in patches:
-              assert patch["default"] is (patch["name"] == "Permanently hide donation banner")
+              assert patch["default"] is (patch["name"] in {"Permanently hide donation banner", "Suppress automatic changelog popup"})
               package, = patch["compatiblePackages"]
               assert package["packageName"] == "eu.faircode.email"
               versions = [t["version"] for t in package["targets"]]
-              if patch["name"].startswith("Enable OAuth setup"):
+              if patch["name"].startswith("Enable OAuth setup") or patch["name"] == "Suppress automatic changelog popup":
                   assert versions == ["1.2338"], versions
               else:
                   assert versions == ["1.2337", "1.2338"], versions
@@ -96,7 +97,7 @@ jobs:
             echo "Refusing to overwrite an existing GitHub release: $TAG"
             exit 1
           fi
-          gh release create "$TAG" "patches/build/libs/patches-$VERSION.mpp"             --target "$GITHUB_SHA"             --title "FairEmail Morphe $VERSION — OAuth setup experiment"             --prerelease             --notes "Development-channel patch bundle with four FairEmail patches. OAuth setup patch is OFF by default, targets only FairEmail 1.2338/1.2338a, and has not yet passed real-device Gmail OAuth authentication tests. Existing stable v0.2.0 is unchanged. Experimental draft PR #1 contains the implementation."
+          gh release create "$TAG" "patches/build/libs/patches-$VERSION.mpp"             --target "$GITHUB_SHA"             --title "FairEmail Morphe $VERSION — OAuth setup experiment"             --prerelease             --notes "Development-channel bundle with five FairEmail patches, including automatic startup changelog suppression ON by default (1.2338 only). OAuth setup patch remains OFF by default. User screenshots verified Gmail OAuth account addition and incoming mail in the modified app; SMTP send, long-term refresh and backup restore are not verified. Stable v0.2.0 stays unchanged."
       - name: Publish the matching dev-branch JSON only after release exists
         shell: bash
         run: |
@@ -105,11 +106,11 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           from scripts.validate_morphe_metadata import validate_asset
-          version = "0.2.1-dev.1"
+          version = "0.2.1-dev.2"
           manifest_file = Path("patches-bundle.json")
           manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
           manifest["created_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
-          manifest["description"] = "Unofficial FairEmail Morphe development preview: four patches including opt-in OAuth setup for re-signed FairEmail 1.2338. Gmail OAuth real-device authentication is unverified."
+          manifest["description"] = "Unofficial FairEmail Morphe development preview: five patches including opt-in OAuth setup and automatic changelog suppression for FairEmail 1.2338. Gmail OAuth account addition and inbound mail observed; SMTP and token refresh unverified."
           manifest["version"] = version
           manifest["download_url"] = f"https://github.com/rikunode/fairemail-morphe-patches/releases/download/v{version}/patches-{version}.mpp"
           manifest["signature_download_url"] = ""
@@ -128,5 +129,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add patches-bundle.json patches-list.json
-          git commit -m "chore(dev): publish 0.2.1-dev.1 OAuth bundle metadata"
+          git commit -m "chore(dev): publish 0.2.1-dev.2 OAuth bundle metadata"
           git push origin HEAD:dev
