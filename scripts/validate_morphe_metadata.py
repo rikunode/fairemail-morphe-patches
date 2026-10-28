@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPOSITORY = "rikunode/fairemail-morphe-patches"
 PATCH = "Permanently hide donation banner"
 # Known stable and opt-in prerelease tracks; reject unknown versions.
-SUPPORTED_VERSIONS = {"0.2.0", "0.2.1-dev.1"}
+SUPPORTED_VERSIONS = {"0.2.0", "0.2.1-dev.1", "0.2.1-dev.2"}
 VERSION = json.loads((ROOT / "patches-bundle.json").read_text(encoding="utf-8"))["version"]
 
 
@@ -52,8 +52,10 @@ def validate_asset(asset: dict, index: dict) -> None:
         "Enable local settings export (experimental)",
         "Enable local Pro features (experimental)",
     }
-    if bundle_version == "0.2.1-dev.1":
+    if bundle_version in {"0.2.1-dev.1", "0.2.1-dev.2"}:
         names.add("Enable OAuth setup in re-signed FairEmail (experimental)")
+    if bundle_version == "0.2.1-dev.2":
+        names.add("Suppress automatic changelog popup")
     if not isinstance(patches, list) or len(patches) != len(names) or {p.get("name") for p in patches} != names:
         raise ValueError("FairEmail patch set mismatch")
     for patch in patches:
@@ -65,7 +67,8 @@ def validate_asset(asset: dict, index: dict) -> None:
             raise ValueError("package must be FairEmail")
         targets = item.get("targets")
         expected_targets = (
-            {"1.2338"} if patch["name"].startswith("Enable OAuth setup")
+            {"1.2338"} if (patch["name"].startswith("Enable OAuth setup") or
+                            patch["name"] == "Suppress automatic changelog popup")
             else {"1.2337", "1.2338"}
         )
         if not isinstance(targets, list) or len(targets) != len(expected_targets):
@@ -81,7 +84,7 @@ def validate_asset(asset: dict, index: dict) -> None:
             by_version[version] = codes
         if set(by_version) != expected_targets:
             raise ValueError("Missing FairEmail version target")
-        if patch.get("default") is not (patch["name"] == "Permanently hide donation banner"):
+        if patch.get("default") is not (patch["name"] in {"Permanently hide donation banner", "Suppress automatic changelog popup"}):
             raise ValueError("Unsafe patch default")
 
 
