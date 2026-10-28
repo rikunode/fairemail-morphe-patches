@@ -1,7 +1,38 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "0.2.0",
+  "version": "0.2.1-dev.1",
   "patches": [
+    {
+      "name": "Enable OAuth setup in re-signed FairEmail (experimental)",
+      "description": "Enable both Gmail and provider OAuth setup menu paths without modifying global signature checks. Google authorization is not guaranteed.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "eu.faircode.email",
+          "name": "FairEmail",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#157B9B",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.2338",
+              "versionCodes": {
+                "ARM64_V8A": 2338,
+                "ARMEABI_V7A": 2338,
+                "X86_64": 2338,
+                "X86": 2338
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "Enable local Pro features (experimental)",
       "description": "Make FairEmail's local Pro feature checks return true. No purchases or signing changes. Does not preserve stock-install data across a signature mismatch.",

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-28T02:00:00",
-  "description": "Unofficial FairEmail 1.2337 and 1.2338 Morphe patch preview: optional Pro features, encrypted settings export, and donation banner hide. Android real-device behavior has not been tested.",
-  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.2.0/patches-0.2.0.mpp",
+  "created_at": "2026-10-28T20:59:28",
+  "description": "Unofficial FairEmail Morphe development preview: four patches including opt-in OAuth setup for re-signed FairEmail 1.2338. Gmail OAuth real-device authentication is unverified.",
+  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.2.1-dev.1/patches-0.2.1-dev.1.mpp",
   "signature_download_url": "",
-  "version": "0.2.0"
+  "version": "0.2.1-dev.1"
 }
