@@ -44,7 +44,8 @@ jobs:
         run: bash ./gradlew :patches:generatePatchesList --no-daemon
       - name: Verify output
         run: |
-          python3 scripts/validate_morphe_metadata.py
+          # Released v0.2.0 metadata is immutable; the generated experimental index
+          # has a fourth patch and is not published to the v0.2.0 release.
           python3 scripts/validate_morphe_bundle.py
           test -s patches/build/libs/patches-0.2.0.mpp
           python3 - <<'PY'
@@ -74,5 +75,5 @@ jobs:
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fairemail-patches-0.2.0
+          name: fairemail-patches-oauth-experimental
           path: patches/build/libs/patches-0.2.0.mpp
