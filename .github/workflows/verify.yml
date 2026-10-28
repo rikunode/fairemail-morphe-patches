@@ -52,18 +52,23 @@ jobs:
           from pathlib import Path
           metadata = json.loads(Path("patches-list.json").read_text())
           assert metadata["version"] == "0.2.0", metadata["version"]
-          assert len(metadata["patches"]) == 3
+          assert len(metadata["patches"]) == 4
           assert {p["name"] for p in metadata["patches"]} == {
               "Permanently hide donation banner",
               "Enable local settings export (experimental)",
               "Enable local Pro features (experimental)",
+              "Enable OAuth setup in re-signed FairEmail (experimental)",
           }
           for patch in metadata["patches"]:
               package, = patch["compatiblePackages"]
               assert package["packageName"] == "eu.faircode.email"
-              assert [t["version"] for t in package["targets"]] == ["1.2337", "1.2338"]
-              assert sorted(package["targets"][0]["versionCodes"].values()) == [2337] * 4
-              assert sorted(package["targets"][1]["versionCodes"].values()) == [2338] * 4
+              if patch["name"].startswith("Enable OAuth setup"):
+                  assert [t["version"] for t in package["targets"]] == ["1.2338"]
+                  assert sorted(package["targets"][0]["versionCodes"].values()) == [2338] * 4
+              else:
+                  assert [t["version"] for t in package["targets"]] == ["1.2337", "1.2338"]
+                  assert sorted(package["targets"][0]["versionCodes"].values()) == [2337] * 4
+                  assert sorted(package["targets"][1]["versionCodes"].values()) == [2338] * 4
           print("Patch/index metadata verification: PASS")
           PY
       - name: Upload patch bundle as workflow artifact
