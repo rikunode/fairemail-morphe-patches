@@ -35,4 +35,9 @@ This is an **unofficial patch bundle** for upstream FairEmail. All operations on
 - If two apps compete for OAuth redirect, identify the exact installed package and default deep link/URI handler; do not uninstall the official app.
 - If the changelog still appears, confirm the **0.2.1-dev.2 or later** bundle's “Suppress automatic changelog popup” patch was actually applied to FairEmail 1.2338; the source being updated is not proof that the installed APK was rebuilt.
 - Never paste OAuth state, backup file contents, passwords or signing keys into a GitHub issue.
-\n## Integrated clone rollout safeguards\n\n- After enabling the dev.3 built-in clone, **deselect** the external universal Clone app in Morphe. Keep only one active.\n- Both implementations target `eu.faircode.email.morphe` by default, but compatibility with the original clone is **not proven** until the Manifest and certificate match and an in-place update succeeds.\n- If update installation fails, preserve the original clone and its backup. Do not uninstall/clear it to force a replacement.\n
+
+## Integrated clone rollout safeguards
+
+- After enabling the dev.3 built-in clone, **deselect** the external universal Clone app in Morphe. Keep only one active.
+- Both implementations target `eu.faircode.email.morphe` by default, but compatibility with the original clone is **not proven** until the Manifest and certificate match and an in-place update succeeds.
+- If update installation fails, preserve the original clone and its backup. Do not uninstall/clear it to force a replacement.\n
