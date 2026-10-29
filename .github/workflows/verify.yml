@@ -36,6 +36,15 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Pin release build version
+        shell: bash
+        run: |
+          VERSION=$(sed -n 's/^version = //p' gradle.properties)
+          case "$VERSION" in
+            0.3.0-rc.1|0.3.0) ;;
+            *) echo "Unexpected release version: $VERSION"; exit 1 ;;
+          esac
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Validate Android Morphe Manager source metadata
         run: |
           python3 -m unittest discover -s tests -v
@@ -49,7 +58,8 @@ jobs:
           import hashlib
           from pathlib import Path
           from scripts.verify_release_candidate import verify_index, verify_bundle, verify_tracked_assets
-          version = "0.2.1-dev.3"
+          import os
+          version = os.environ["VERSION"]
           bundle = Path(f"patches/build/libs/patches-{version}.mpp")
           index = json.loads(Path("patches-list.json").read_text(encoding="utf-8"))
           verify_index(index, version)
@@ -77,7 +87,7 @@ jobs:
           export MORPHE_DATA_DIR="$TEST_DIR/data"
           mkdir -p "$MORPHE_DATA_DIR"
           env -u GITHUB_TOKEN -u GITHUB_ACTOR java -jar "$TEST_DIR/morphe-desktop.jar" patch \
-            -p patches/build/libs/patches-0.2.1-dev.3.mpp \
+            -p "patches/build/libs/patches-$VERSION.mpp" \
             --exclusive --unsigned \
             -e "Permanently hide donation banner" \
             -e "Enable local settings export (experimental)" \
@@ -123,5 +133,5 @@ jobs:
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fairemail-patches-clone-dev3
-          path: patches/build/libs/patches-0.2.1-dev.3.mpp
+          name: fairemail-patches-release-candidate
+          path: patches/build/libs/patches-0.3.0*.mpp
