@@ -61,6 +61,48 @@ jobs:
           assert option_defaults == {"packageName": "Default", "updatePermissions": True, "updateProviders": True}, option_defaults
           print("FAIREMAIL_SIX_PATCH_CLONE_ANDROID_BUNDLE_PASS", hashlib.sha256(bundle.read_bytes()).hexdigest())
           PY
+      - name: Smoke-apply all six patches to pristine upstream FairEmail APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          TEST_DIR="$RUNNER_TEMP/fairemail-patch-smoke"
+          mkdir -p "$TEST_DIR"
+          curl -fL --retry 3 --retry-delay 3 \
+            -o "$TEST_DIR/original.apk" \
+            "https://github.com/M66B/FairEmail/releases/download/1.2338/FairEmail-v1.2338a-github-release.apk"
+          echo "666b9f4ada53f69199355f1ccc2bed73e01fa23786fc0189cf81cc51932dc5a9  $TEST_DIR/original.apk" | sha256sum --check -
+          curl -fL --retry 3 --retry-delay 3 \
+            -o "$TEST_DIR/morphe-desktop.jar" \
+            "https://github.com/MorpheApp/morphe-desktop/releases/download/v1.19.1/morphe-desktop-1.19.1-all.jar"
+          export MORPHE_DATA_DIR="$TEST_DIR/data"
+          mkdir -p "$MORPHE_DATA_DIR"
+          env -u GITHUB_TOKEN -u GITHUB_ACTOR java -jar "$TEST_DIR/morphe-desktop.jar" patch \
+            -p patches/build/libs/patches-0.2.1-dev.3.mpp \
+            --exclusive --unsigned \
+            -e "Permanently hide donation banner" \
+            -e "Enable local settings export (experimental)" \
+            -e "Enable local Pro features (experimental)" \
+            -e "Enable OAuth setup in re-signed FairEmail (experimental)" \
+            -e "Suppress automatic changelog popup" \
+            -e "Clone FairEmail alongside official app" \
+            -o "$TEST_DIR/clone-unsigned.apk" "$TEST_DIR/original.apk"
+          test -s "$TEST_DIR/clone-unsigned.apk"
+          python3 - "$TEST_DIR/clone-unsigned.apk" <<'PY'
+          import pathlib,sys,zipfile
+          path = pathlib.Path(sys.argv[1])
+          with zipfile.ZipFile(path) as zipf:
+              assert zipf.testzip() is None
+              assert "AndroidManifest.xml" in zipf.namelist()
+              assert "classes.dex" in zipf.namelist()
+          print("FAIREMAIL_SIX_PATCH_APK_ZIP_PASS",path.stat().st_size)
+          PY
+          AAPT=$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name aapt -print | sort -V | tail -1)
+          test -x "$AAPT"
+          "$AAPT" dump badging "$TEST_DIR/clone-unsigned.apk" > "$TEST_DIR/badging.txt"
+          grep -q "package: name='eu.faircode.email.morphe'" "$TEST_DIR/badging.txt"
+          grep -q "versionName='1.2338'" "$TEST_DIR/badging.txt"
+          echo "FAIREMAIL_CLONE_APK_PACKAGE_PASS: eu.faircode.email.morphe"
+          # Smoke outputs are unsigned, ephemeral and NOT published as release artifacts.
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
         with:
