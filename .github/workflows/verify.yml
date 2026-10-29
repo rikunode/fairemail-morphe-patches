@@ -102,6 +102,39 @@ jobs:
           grep -q "package: name='eu.faircode.email.morphe'" "$TEST_DIR/badging.txt"
           grep -q "versionName='1.2338'" "$TEST_DIR/badging.txt"
           echo "FAIREMAIL_CLONE_APK_PACKAGE_PASS: eu.faircode.email.morphe"
+          # Regression parity against the same original APK transformed by the
+          # pinned official Morphe "Clone app" patch (GPLv3 upstream).
+          curl -fL --retry 3 --retry-delay 3 \
+            -o "$TEST_DIR/morphe-official-clone.mpp" \
+            "https://github.com/MorpheApp/morphe-patches/releases/download/v1.48.0/patches-1.48.0.mpp"
+          echo "82bc696c94c26dbf75242b59980251315145457575b663200b981ca351e1c0f7  $TEST_DIR/morphe-official-clone.mpp" | sha256sum --check -
+          env -u GITHUB_TOKEN -u GITHUB_ACTOR java -jar "$TEST_DIR/morphe-desktop.jar" patch \
+            -p "$TEST_DIR/morphe-official-clone.mpp" \
+            --exclusive --unsigned \
+            -e "Clone app" \
+            -o "$TEST_DIR/official-clone-unsigned.apk" "$TEST_DIR/original.apk"
+          test -s "$TEST_DIR/official-clone-unsigned.apk"
+          "$AAPT" dump badging "$TEST_DIR/official-clone-unsigned.apk" > "$TEST_DIR/official-badging.txt"
+          grep -q "package: name='eu.faircode.email.morphe'" "$TEST_DIR/official-badging.txt"
+          "$AAPT" dump xmltree "$TEST_DIR/clone-unsigned.apk" AndroidManifest.xml > "$TEST_DIR/our-manifest.txt"
+          "$AAPT" dump xmltree "$TEST_DIR/official-clone-unsigned.apk" AndroidManifest.xml > "$TEST_DIR/upstream-manifest.txt"
+          python3 - "$TEST_DIR/our-manifest.txt" "$TEST_DIR/upstream-manifest.txt" <<'PY'
+          import pathlib,re,sys
+          def authorities(path):
+              lines = pathlib.Path(path).read_text().splitlines()
+              found = []
+              for line in lines:
+                  if "android:authorities" in line:
+                      m=re.search(r'="([^"]+)"', line)
+                      if not m: raise AssertionError("Could not parse provider authority: "+line)
+                      found.extend(m.group(1).split(";"))
+              if not found: raise AssertionError("No manifest provider authorities found")
+              return sorted(found)
+          ours, upstream = map(authorities,sys.argv[1:])
+          assert ours == upstream, f"Provider authority parity mismatch: ours={ours}, upstream={upstream}"
+          print("FAIREMAIL_CLONE_UPSTREAM_PROVIDER_PARITY_PASS",ours)
+          PY
+
           # Smoke outputs are unsigned, ephemeral and NOT published as release artifacts.
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
