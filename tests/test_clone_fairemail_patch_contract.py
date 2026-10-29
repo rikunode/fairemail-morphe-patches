@@ -41,6 +41,7 @@ class CloneFairEmailContract(unittest.TestCase):
         self.assertIn('return@use',self.s)
         self.assertIn('manifest.setAttribute("package", replacement)',self.s)
         self.assertIn('android:authorities',self.s)
+        self.assertIn('authority == original -> "${replacement}_$authority"',self.s)
         self.assertIn('android:name',self.s)
         self.assertIn("another clone patch",self.s)
         self.assertIn("replacement != ORIGINAL_PACKAGE",self.s)
