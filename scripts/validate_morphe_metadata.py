@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPOSITORY = "rikunode/fairemail-morphe-patches"
 PATCH = "Permanently hide donation banner"
 # Known stable and opt-in prerelease tracks; reject unknown versions.
-SUPPORTED_VERSIONS = {"0.2.0", "0.2.1-dev.1", "0.2.1-dev.2", "0.2.1-dev.3"}
+SUPPORTED_VERSIONS = {"0.2.0", "0.2.1-dev.1", "0.2.1-dev.2", "0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"}
 VERSION = json.loads((ROOT / "patches-bundle.json").read_text(encoding="utf-8"))["version"]
 
 
@@ -52,11 +52,11 @@ def validate_asset(asset: dict, index: dict) -> None:
         "Enable local settings export (experimental)",
         "Enable local Pro features (experimental)",
     }
-    if bundle_version in {"0.2.1-dev.1", "0.2.1-dev.2", "0.2.1-dev.3"}:
+    if bundle_version in {"0.2.1-dev.1", "0.2.1-dev.2", "0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"}:
         names.add("Enable OAuth setup in re-signed FairEmail (experimental)")
-    if bundle_version in {"0.2.1-dev.2", "0.2.1-dev.3"}:
+    if bundle_version in {"0.2.1-dev.2", "0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"}:
         names.add("Suppress automatic changelog popup")
-    if bundle_version == "0.2.1-dev.3":
+    if bundle_version in {"0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"}:
         names.add("Clone FairEmail alongside official app")
     if not isinstance(patches, list) or len(patches) != len(names) or {p.get("name") for p in patches} != names:
         raise ValueError("FairEmail patch set mismatch")
