@@ -56,7 +56,7 @@ class CloneManifestParityTests(unittest.TestCase):
 
     def test_reject_bad_identifier(self):
         wrong = XML.replace("eu.faircode.email.morphe.cropper", "eu.faircode.email.cropper")
-        with self.assertRaisesRegex(ValueError, "Un-cloned"):
+        with self.assertRaisesRegex(ValueError, "un-cloned"):
             check_parity(self.parse(wrong), self.parse(wrong))
 
 
