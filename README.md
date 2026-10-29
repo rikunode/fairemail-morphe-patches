@@ -39,6 +39,8 @@ In the original FairEmail 1.2338 build, Gmail OAuth setup is gated by FairEmail'
 ## Use in Morphe Manager
 
 1. Add this repository as a patch source using the link above.
+   **For stable v0.3.0, turn OFF Morphe Manager's “Use prerelease patches” setting.** If it remains ON, Morphe may still load the older `dev` channel (`0.2.1-dev.3`) instead of `main` (`0.3.0`). Turning it OFF only changes the patch source channel; it does not update an already installed APK.
+
 2. Provide an unmodified official GitHub FairEmail 1.2337a or 1.2338a APK.
 3. Select patches. Export, Pro, and OAuth are disabled by default. Changelog suppression and the new built-in clone are ON by default for FairEmail 1.2338. If you previously used the separate **Morphe Patches → Clone app**, turn that **OFF**; our integrated clone replaces it. Confirm the same package suffix (`.morphe`) and signing key before updating an existing modified clone.
 4. For a first installation, prefer a separate test installation. For a previously installed clone, preserve the existing app and signing key, export an encrypted backup, and compare its signer/package with the candidate using the read-only `scripts/check_clone_upgrade.py` before attempting an update. Never uninstall or clear app data simply to overcome an installer mismatch.
