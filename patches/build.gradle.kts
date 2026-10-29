@@ -1,7 +1,7 @@
 group = "dev.rikunode.fairemail"
 patches {
     about {
-        name = "FairEmail Morphe customizations"
+        name = "FairEmail Patches"
         description = "FairEmail privacy-focused patch set: built-in clone, hidden banners and changelog, opt-in OAuth, local Pro and settings export"
         source = "https://github.com/rikunode/fairemail-morphe-patches"
         author = "rikunode"

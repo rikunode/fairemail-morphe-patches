@@ -41,7 +41,7 @@ jobs:
         run: |
           VERSION=$(sed -n 's/^version = //p' gradle.properties)
           case "$VERSION" in
-            0.3.0-rc.1|0.3.0) ;;
+            0.3.0-rc.1|0.3.0|0.3.1) ;;
             *) echo "Unexpected release version: $VERSION"; exit 1 ;;
           esac
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
@@ -65,6 +65,13 @@ jobs:
           verify_index(index, version)
           verify_bundle(bundle)
           verify_tracked_assets()
+          import zipfile
+          with zipfile.ZipFile(bundle) as patch_archive:
+              attrs = patch_archive.read("META-INF/MANIFEST.MF").decode("utf-8")
+          if version == "0.3.1":
+              assert "Name: FairEmail Patches\r\n" in attrs.replace("\n", "\r\n").replace("\r\r\n", "\r\n"), "Missing expected Morphe source display name"
+              assert "FairEmail Morphe customizations" not in attrs, "Stale bundle display name"
+              print("FAIREMAIL_PATCHES_SOURCE_NAME_PASS")
           clone, = (p for p in index["patches"] if p["name"] == "Clone FairEmail alongside official app")
           assert clone["default"] is True
           option_defaults = {option["key"]: option["default"] for option in clone["options"]}
@@ -133,5 +140,5 @@ jobs:
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fairemail-patches-release-candidate
-          path: patches/build/libs/patches-0.3.0*.mpp
+          name: fairemail-patches-${{ env.VERSION }}
+          path: patches/build/libs/patches-0.3*.mpp

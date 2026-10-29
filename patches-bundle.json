@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-29T21:48:00",
-  "description": "Unofficial FairEmail Morphe v0.3.0: six FairEmail patches with built-in clone and changelog suppression; optional experimental OAuth setup, Pro checks and settings export OFF by default. Gmail receive and account import were observed; SMTP send, delayed refresh and in-place cloned-app upgrade remain unverified.",
-  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.3.0/patches-0.3.0.mpp",
+  "created_at": "2026-10-29T22:12:00",
+  "description": "FairEmail Patches v0.3.1, unofficial Morphe six-patch source. Display name renamed from FairEmail Morphe customizations; patches and compatibility unchanged from v0.3.0. OAuth/Pro/export remain opt-in experimental, clone and changelog suppression ON. No data migration, OAuth refresh or SMTP guarantee.",
+  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.3.1/patches-0.3.1.mpp",
   "signature_download_url": "",
-  "version": "0.3.0"
+  "version": "0.3.1"
 }

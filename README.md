@@ -1,4 +1,4 @@
-# FairEmail Morphe patches
+# FairEmail Patches
 
 Unofficial GPL-3.0-licensed Morphe patch source for the official GitHub FairEmail **1.2337a and 1.2338a** APKs (package `eu.faircode.email`).
 
@@ -53,7 +53,7 @@ The build uses Java 21 and the Gradle wrapper. CI checks out pinned public Morph
 
 Run `./gradlew :patches:generatePatchesList`, `python scripts/validate_morphe_metadata.py`, `python scripts/validate_morphe_bundle.py`.
 
-**Project stable release: [v0.3.0](https://github.com/rikunode/fairemail-morphe-patches/releases/tag/v0.3.0)** (six patches). The older [v0.2.1-dev.3](https://github.com/rikunode/fairemail-morphe-patches/releases/tag/v0.2.1-dev.3) prerelease is retained for reproducibility. **Stable is the distribution channel, NOT a statement that every opt-in experimental feature is supported on all Android devices.** Gmail OAuth refresh, SMTP sending from the modified app, imported-device new mail sync, changelog suppression on-device and data-preserving clone upgrades remain **unverified**. Read [release notes](docs/RELEASE_NOTES_0.3.0.md), [release readiness audit](docs/RELEASE_READINESS.md) and [safe update/restore instructions](docs/UPGRADE_AND_RESTORE.md).
+**Project stable release: [v0.3.1](https://github.com/rikunode/fairemail-morphe-patches/releases/tag/v0.3.1)** (six patches). The older [v0.2.1-dev.3](https://github.com/rikunode/fairemail-morphe-patches/releases/tag/v0.2.1-dev.3) prerelease is retained for reproducibility. **Stable is the distribution channel, NOT a statement that every opt-in experimental feature is supported on all Android devices.** Gmail OAuth refresh, SMTP sending from the modified app, imported-device new mail sync, changelog suppression on-device and data-preserving clone upgrades remain **unverified**. Read [release notes](docs/RELEASE_NOTES_0.3.0.md), [release readiness audit](docs/RELEASE_READINESS.md) and [safe update/restore instructions](docs/UPGRADE_AND_RESTORE.md).
 
 **Backup privacy:** When the export password is empty, upstream FairEmail 1.2338 writes unencrypted JSON. Always use a nonempty strong password, never post backup files or tokens publicly, and retain the old installed app/data until restoration and token refresh are verified. This independent project is not affiliated with FairEmail, FairCode, or Morphe. Licensed under GPL-3.0. See LICENSE.
 
@@ -66,3 +66,9 @@ FairEmail 1.2338 has a built-in `show_changelog` setting under miscellaneous opt
 The built-in `Clone FairEmail alongside official app` is adapted from [Morphe's GPLv3 Clone app implementation](https://github.com/MorpheApp/morphe-patches/blob/main/patches/src/main/kotlin/app/morphe/patches/all/misc/clone/CloneAppPatch.kt), preserving its required copyright/license notice and the default `eu.faircode.email.morphe` package ID, plus the option keys `packageName`, `updatePermissions` and `updateProviders`. This means the **intended** identity matches the previously user-tested external Clone app, but an in-place update still depends on an **identical signing key** and needs its own device test.
 
 **Do not enable both clone patches.** Keep the separate Morphe universal Clone app **OFF** when using this bundle's integrated clone. To avoid an incompatible signature/package upgrade, never uninstall or clear the existing clone simply to resolve an installation conflict. Before upgrading an installed signed clone, the read-only `scripts/check_clone_upgrade.py --candidate /path/to/signed-clone.apk` can compare the installed package/version and SHA-256 signing certificate with the candidate without changing any app data. This is an optional safety check, not an automated installation. The integrated clone is limited to the verified original FairEmail 1.2338 for now.
+
+## Patch source name
+
+The Morphe source is named **FairEmail Patches** since v0.3.1, replacing the earlier display name **FairEmail Morphe customizations**. The GitHub repository URL and the six patch names/behaviors remain unchanged. Morphe Manager reads the source name from the MPP manifest after source refresh. If you previously gave this source a custom local display name (via the pencil Rename action), that override takes precedence; rename it locally to **FairEmail Patches** without removing or re-adding the source.
+
+In Morphe Manager, turn **Use prerelease patches OFF** to load the stable `main` release. Updating a patch source name/MPP does **not** update or reinstall an existing FairEmail APK.
