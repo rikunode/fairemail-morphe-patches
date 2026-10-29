@@ -13,7 +13,7 @@ This is an **unofficial patch bundle** for upstream FairEmail. All operations on
 ## Updating an installed modified clone
 
 - **Backup first.** Export encrypted settings with a nonempty strong password; retain the old working APK and patch source.
-- **Keep the same package name and signing certificate.** Android will not accept an app-data-preserving update of an existing package if the signing key has changed.
+- **Keep the same package name and signing certificate.** Android will not accept an app-data-preserving update of an existing package if the signing key has changed. A **read-only preflight** is available before any attempted install: `python scripts/check_clone_upgrade.py --candidate /path/to/signed-clone.apk` (Android SDK `adb`, `aapt`, `apksigner` required; phone must be connected with USB debugging). This inspects the installed app's public base.apk in a temporary directory and compares package identity, versionCode and signing certificate; it does **not** install, delete or change app data. Passing the preflight does not prove OAuth or data persistence.
 - **Do not change Clone app package suffix** between updates. If migrating from the universal Morphe Clone app to the integrated clone, turn the **universal patch OFF**, preserve `.morphe`, and verify signing certificate consistency before installing.
 - **Never assume the official FairEmail app is replaceable by a differently signed APK.** Using the clone path is safer for parallel installation.
 - Install as an update, not by uninstalling the old app. Confirm Gmail inbox, SMTP, token refresh and settings after install. Roll back only through a path compatible with Android's version/signature rules and after securing a tested backup.
