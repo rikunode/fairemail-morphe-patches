@@ -34,7 +34,9 @@ Audit date: 2026-10-29 JST. This report is a release-blocking checklist, not a c
 | Other Gmail / Outlook OAuth providers or Android variants | NOT YET VERIFIED | Tested path is Gmail on the supplied build |
 | Exact six-patch application to pristine pinned APK, unsigned rebuilt APK integrity | VERIFIED CI | All six applied and APK ZIP/build/manifest passed in GitHub Actions 40826756073 |
 
-## P0 release gates — must pass before changing the default stable source
+## P0 device-acceptance gates — required before claiming seamless migrations
+
+The stable-channel v0.3.0 **patch bundle distribution** can be published with clearly labeled experimental features and non-destructive install instructions. These remaining P0 tests are **required before we can claim production-grade Gmail OAuth refresh, full SMTP behavior, or safe in-place data-preserving clone migration**. Publication does **not** mark these tests as passed.
 
 1. Confirm the **imported** account on the destination Android device receives a **new** message, not only folders that came from the backup.
 2. Send a message **from the patched FairEmail** and confirm delivery to a different mailbox (SMTP).
@@ -66,10 +68,10 @@ FairEmail 1.2338 exports a JSON object including account and identity records, r
 
 ## Release artifact and channel design
 
-- **main**: stable `v0.2.0` remains unchanged while gates are open.
+- **main**: promotion candidate `v0.3.0` contains all six patches; earlier release tag/assets `v0.2.0` are never overwritten. All public claims remain scoped to verified evidence.
 - **dev**: published `v0.2.1-dev.3`, six patches; GitHub source metadata and release asset agree. The integrated clone is APK-smoke-tested but **not yet data-preserving device-update verified**.
 - **release/readiness-0.3.0**: documentation and tests for the next stable candidate, NOT an announcement of a completed release.
-- Candidate target name: `v0.3.0-rc.1`. Produce a *draft* or isolated candidate first; do not silently replace stable `main`.
+- Release candidate `v0.3.0-rc.1` has already been compiled, smoke-tested and released separately. Stable `v0.3.0` requires fresh CI validation and is published as a *new* release, never a replacement of older release assets.
 - Ship the **.mpp patch bundle and source**, not a pre-signed FairEmail APK or user-specific backup.
 - Provide the exact original APK link/hash, compiled bundle SHA-256, Git commit SHA, compatibility matrix, known issues, update/rollback procedure and changelog.
 - Preserve version pinning; avoid rewriting a published tag or release asset. Test Morphe Android index loading, not only JVM/Gradle compilation.
@@ -86,4 +88,4 @@ FairEmail 1.2338 exports a JSON object including account and identity records, r
 
 ## Go / no-go
 
-**Current status: RELEASE CANDIDATE PREPARATION; NOT STABLE-READY.** Account import is user-confirmed, but imported sync, outbound SMTP, token refresh, clone update signing, changelog suppression on-device and integrated-clone device update and sustained OAuth behavior still require evidence. Do not convert these to PASS based on static tests or a successful MPP build.
+**Current status: STABLE-CHANNEL PATCH DISTRIBUTION CANDIDATE; EXPERIMENTAL DEVICE FUNCTIONS NOT FULLY ACCEPTED.** The code/publishing chain and six-patch APK rebuild are CI-verified. Account import is user-confirmed; destination sync, outgoing SMTP, token refresh, clone update signing, real-device changelog suppression and data-preserving upgrade still require direct evidence. Do not convert these to PASS based on static tests or a successful MPP build. Stable-channel release notes prominently disclose these limitations.
