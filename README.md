@@ -23,7 +23,7 @@ The local Pro, encrypted export, and OAuth experiments must be selected manually
 | 1.2337 (v1.2337a) | [FairEmail-v1.2337a-github-release.apk](https://github.com/M66B/FairEmail/releases/download/1.2337/FairEmail-v1.2337a-github-release.apk) | `e8337c82f9829f2c2ad89c04a27af62d74daa3be141558845bd6ee0ddd8c79c8` |
 | 1.2338 (v1.2338a) | [FairEmail-v1.2338a-github-release.apk](https://github.com/M66B/FairEmail/releases/download/1.2338/FairEmail-v1.2338a-github-release.apk) | `666b9f4ada53f69199355f1ccc2bed73e01fa23786fc0189cf81cc51932dc5a9` |
 
-These exact **GitHub APKs** have been tested with Morphe Desktop. Other flavors (Google Play, F-Droid, large builds), older versions, and newer versions have **not** been verified.
+The original **GitHub APKs** are pinned by SHA-256. The three initial patches have historical Morphe Desktop application evidence for 1.2337a and 1.2338a; the newer OAuth and changelog patches target **1.2338 only** and require their own end-to-end APK application regression. Other flavors (Google Play, F-Droid, large builds), older and newer versions are **not verified**.
 
 ## IMPORTANT — do not delete your existing FairEmail
 
@@ -31,7 +31,9 @@ These exact **GitHub APKs** have been tested with Morphe Desktop. Other flavors 
 
 In the original FairEmail 1.2338 build, Gmail OAuth setup is gated by FairEmail's local certificate check. The opt-in Morphe OAuth patch changes the local menu gate only. On 2026-10-29, user-supplied Android screenshots verified Google consent, account addition, and reading an incoming Gmail message in a patched environment. SMTP send, delayed token refresh, and backup restoration remain **unverified**. Never share passwords or backup archives.
 
-**Verification boundary (2026-10-28):** [GitHub Actions](https://github.com/rikunode/fairemail-morphe-patches/actions/runs/40550825839) completed successfully. The published v0.2.0 MPP was downloaded back from the public Release, with SHA-256 `cde8e2184b7c567650c374247b80e20f662d5c9b913c63285e97c4b6053bd225`. Morphe Desktop v1.19.1 independently resolved the GitHub repository URL, downloaded the 43,280-byte MPP, and recognized all three patches with the correct compatibility targets. The **public remote MPP** was also applied to the pinned original 1.2337a and 1.2338a APKs, with three patches applied, zero failures and successful APK rebuilds in both cases (these remote-test outputs were unsigned). Earlier local signed APKs and targeted DEX-prefix checks also passed. **Android Morphe Manager import on an actual phone, app launch, Gmail login, encrypted backup creation, and second-device restore remain unverified.** Treat this as a preview for controlled testing, not a guaranteed data migration.
+**Current verification boundary (2026-10-29):** The development five-patch MPP `0.2.1-dev.2` was compiled and verified in [GitHub Actions](https://github.com/rikunode/fairemail-morphe-patches/actions/runs/40821254754). Android Morphe Manager source loading, Google OAuth consent, account addition and reading a new Gmail message in a modified FairEmail app were shown by user screenshots. An encrypted backup was generated; the user subsequently confirmed successful **account import on another phone**. That report does not yet prove the imported account can receive *new* messages or refresh an expired OAuth token; SMTP send **from the modified app**, in-place clone updates using the same signing key, and on-device changelog suppression also remain unverified. These are release gates rather than reasons to delete working data.
+
+**Historical v0.2.0 evidence (2026-10-28):** [GitHub Actions](https://github.com/rikunode/fairemail-morphe-patches/actions/runs/40550825839) passed; public 43,280-byte MPP checksum `cde8e2184b7c567650c374247b80e20f662d5c9b913c63285e97c4b6053bd225` was verified and the three older patches applied to pinned 1.2337a/1.2338a APKs via Morphe Desktop (unsigned output). Do not mistake this old result for a real five-patch APK test.
 
 ## Use in Morphe Manager
 
@@ -48,7 +50,9 @@ The build uses Java 21 and the Gradle wrapper. CI checks out pinned public Morph
 
 Run `./gradlew :patches:generatePatchesList`, `python scripts/validate_morphe_metadata.py`, `python scripts/validate_morphe_bundle.py`.
 
-Dev channel: **0.2.1-dev.2 preview** with five patches. Stable main/release **v0.2.0** remains unchanged. This independent project is not affiliated with FairEmail, FairCode, or Morphe. Licensed under GPL-3.0. See LICENSE.
+Dev channel: **0.2.1-dev.2 preview** with five patches. Stable main/release **v0.2.0** remains unchanged. **Stable v0.3.0 is NOT published or approved yet.** The release readiness audit, safe update/restore instructions, and draft release notes live in [docs/RELEASE_READINESS.md](docs/RELEASE_READINESS.md), [docs/UPGRADE_AND_RESTORE.md](docs/UPGRADE_AND_RESTORE.md) and [docs/RELEASE_NOTES_DRAFT.md](docs/RELEASE_NOTES_DRAFT.md).
+
+**Backup privacy:** When the export password is empty, upstream FairEmail 1.2338 writes unencrypted JSON. Always use a nonempty strong password, never post backup files or tokens publicly, and retain the old installed app/data until restoration and token refresh are verified. This independent project is not affiliated with FairEmail, FairCode, or Morphe. Licensed under GPL-3.0. See LICENSE.
 
 ## Changelog popup patch scope
 
