@@ -70,7 +70,7 @@ class ReleaseReadinessTests(unittest.TestCase):
 
     def test_release_candidate_has_six_strict_patches(self):
         idx = copy.deepcopy(self.index)
-        for target in ("0.3.0-rc.1", "0.3.0"):
+        for target in ("0.3.0-rc.1", "0.3.0", "0.3.1"):
             idx["version"] = target
             verify_index(idx, target)
 
@@ -78,7 +78,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         idx = copy.deepcopy(self.index)
         item = next(p for p in idx["patches"] if p["name"].startswith("Clone FairEmail"))
         item["default"] = False
-        for target in ("0.3.0-rc.1", "0.3.0"):
+        for target in ("0.3.0-rc.1", "0.3.0", "0.3.1"):
             idx["version"] = target
             with self.assertRaisesRegex(ValueError, "unsafe default"):
                 verify_index(idx, target)
