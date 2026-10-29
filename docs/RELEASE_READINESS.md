@@ -1,6 +1,6 @@
 # FairEmail Morphe release-readiness audit
 
-Audit date: 2026-10-29 JST. Target: **the independent Morphe patch bundle**, not an upstream FairEmail release or a pre-patched APK.
+Audit date: 2026-10-29 JST. This report is a release-blocking checklist, not a claim that installed user data can be upgraded safely. Target: **the independent Morphe patch bundle**, not an upstream FairEmail release or a pre-patched APK.
 
 ## Product requirements traced from the original design
 

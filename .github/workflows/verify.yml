@@ -118,23 +118,7 @@ jobs:
           grep -q "package: name='eu.faircode.email.morphe'" "$TEST_DIR/official-badging.txt"
           "$AAPT" dump xmltree "$TEST_DIR/clone-unsigned.apk" AndroidManifest.xml > "$TEST_DIR/our-manifest.txt"
           "$AAPT" dump xmltree "$TEST_DIR/official-clone-unsigned.apk" AndroidManifest.xml > "$TEST_DIR/upstream-manifest.txt"
-          python3 - "$TEST_DIR/our-manifest.txt" "$TEST_DIR/upstream-manifest.txt" <<'PY'
-          import pathlib,re,sys
-          def authorities(path):
-              lines = pathlib.Path(path).read_text().splitlines()
-              found = []
-              for line in lines:
-                  if "android:authorities" in line:
-                      m=re.search(r'="([^"]+)"', line)
-                      if not m: raise AssertionError("Could not parse provider authority: "+line)
-                      found.extend(m.group(1).split(";"))
-              if not found: raise AssertionError("No manifest provider authorities found")
-              return sorted(found)
-          ours, upstream = map(authorities,sys.argv[1:])
-          assert ours == upstream, f"Provider authority parity mismatch: ours={ours}, upstream={upstream}"
-          print("FAIREMAIL_CLONE_UPSTREAM_PROVIDER_PARITY_PASS",ours)
-          PY
-
+          python3 scripts/check_clone_manifest_parity.py "$TEST_DIR/our-manifest.txt" "$TEST_DIR/upstream-manifest.txt"
           # Smoke outputs are unsigned, ephemeral and NOT published as release artifacts.
       - name: Upload patch bundle as workflow artifact
         uses: actions/upload-artifact@v4
