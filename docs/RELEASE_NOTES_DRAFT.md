@@ -8,6 +8,7 @@ This is an independent, unofficial Morphe patch bundle for the upstream FairEmai
 - Keep experimental local Pro checks and built-in encrypted export access, both opt-in.
 - Add experimental Gmail/other-provider OAuth setup entry for re-signed FairEmail 1.2338, opt-in.
 - Add automatic changelog popup suppression for FairEmail 1.2338, enabled by default (manual changelog preserved).
+- Add a built-in `Clone FairEmail alongside official app` patch (default ON, 1.2338 only), adapted from Morphe's GPLv3 universal Clone app and preserving `.morphe` naming. **Disable Morphe's other Clone app patch** when using it.
 - Continue shipping an Android-loadable Morphe `.mpp` with `classes.dex`, not a pre-modified APK.
 - Preserve original APK checks, fail-closed instruction guards, and an independent pre-release development channel.
 
@@ -20,7 +21,7 @@ This is an independent, unofficial Morphe patch bundle for the upstream FairEmai
 
 ## Not yet verified — no stable claims
 
-SMTP send from patched FairEmail, imported account *new* sync/refresh, unattended token refresh after expiration, safe in-place clone upgrades with the same key, five-patch real APK regression test, automatic changelog suppression on-device.
+SMTP send from patched FairEmail, imported account *new* sync/refresh, unattended token refresh after expiration, safe in-place clone upgrades with the same key, six-patch real APK regression and integrated-clone upgrade test, automatic changelog suppression on-device.
 
 ## Safety notices
 
