@@ -5,7 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from verify_release_candidate import PATCHES, CLONE, DEV3, verify_index
+from verify_release_candidate import PATCHES, CLONE, DEV3, SIX_PATCH_VERSIONS, verify_index
 
 
 class ReleaseReadinessTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class ReleaseReadinessTests(unittest.TestCase):
 
     def test_index_matches_exact_release_set(self):
         verify_index(self.index, self.asset["version"])
-        self.assertEqual(len(self.index["patches"]), 6 if self.asset["version"] == DEV3 else 5)
+        self.assertEqual(len(self.index["patches"]), 6 if self.asset["version"] in SIX_PATCH_VERSIONS else 5)
 
     def test_cannot_drop_changelog_suppression(self):
         idx = copy.deepcopy(self.index)
@@ -67,6 +67,21 @@ class ReleaseReadinessTests(unittest.TestCase):
         clone["default"] = False
         with self.assertRaisesRegex(ValueError, "unsafe default"):
             verify_index(idx, DEV3)
+
+    def test_release_candidate_has_six_strict_patches(self):
+        idx = copy.deepcopy(self.index)
+        for target in ("0.3.0-rc.1", "0.3.0"):
+            idx["version"] = target
+            verify_index(idx, target)
+
+    def test_release_default_clone_cannot_be_disabled(self):
+        idx = copy.deepcopy(self.index)
+        item = next(p for p in idx["patches"] if p["name"].startswith("Clone FairEmail"))
+        item["default"] = False
+        for target in ("0.3.0-rc.1", "0.3.0"):
+            idx["version"] = target
+            with self.assertRaisesRegex(ValueError, "unsafe default"):
+                verify_index(idx, target)
 
     def test_known_patch_count(self):
         self.assertEqual(len(PATCHES), 5)
