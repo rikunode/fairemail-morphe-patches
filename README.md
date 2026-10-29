@@ -11,8 +11,10 @@ Unofficial GPL-3.0-licensed Morphe patch source for the official GitHub FairEmai
 | Permanently hide donation banner | On | Hide the support banner above the mail list |
 | Enable local settings export (experimental) | Off | Open FairEmail's existing encrypted account/settings export dialog |
 | Enable local Pro features (experimental) | Off | Enable application-local Pro feature checks, without modifying purchase records |
+| Enable OAuth setup in re-signed FairEmail (experimental) | Off | Allow OAuth entry from the setup menu in re-signed FairEmail 1.2338; does not impersonate signatures |
+| Suppress automatic changelog popup | On | Stop the automatic changelog dialog at startup without removing changelog content or first-run welcome |
 
-The two experimental options must be selected manually.
+The local Pro, encrypted export, and OAuth experiments must be selected manually. The changelog popup suppression is enabled by default and can be deselected.
 
 ## Supported original APKs — exact version and SHA-256
 
@@ -27,7 +29,7 @@ These exact **GitHub APKs** have been tested with Morphe Desktop. Other flavors 
 
 **Morphe re-signs the APK. A re-signed APK cannot update an official FairCode-signed installation in place and keep app data on an unrooted phone.** Do not use auto-uninstall-on-conflict, clear storage, uninstall official FairEmail, or assume an existing Gmail login will carry over.
 
-Gmail official OAuth in a Morphe-re-signed FairEmail fails FairEmail's signing certificate restrictions. Personal Google accounts eligible for app passwords can try setting up Gmail as an **Other provider / IMAP** account using their own Google app password. Never share passwords or backup archives.
+In the original FairEmail 1.2338 build, Gmail OAuth setup is gated by FairEmail's local certificate check. The opt-in Morphe OAuth patch changes the local menu gate only. On 2026-10-29, user-supplied Android screenshots verified Google consent, account addition, and reading an incoming Gmail message in a patched environment. SMTP send, delayed token refresh, and backup restoration remain **unverified**. Never share passwords or backup archives.
 
 **Verification boundary (2026-10-28):** [GitHub Actions](https://github.com/rikunode/fairemail-morphe-patches/actions/runs/40550825839) completed successfully. The published v0.2.0 MPP was downloaded back from the public Release, with SHA-256 `cde8e2184b7c567650c374247b80e20f662d5c9b913c63285e97c4b6053bd225`. Morphe Desktop v1.19.1 independently resolved the GitHub repository URL, downloaded the 43,280-byte MPP, and recognized all three patches with the correct compatibility targets. The **public remote MPP** was also applied to the pinned original 1.2337a and 1.2338a APKs, with three patches applied, zero failures and successful APK rebuilds in both cases (these remote-test outputs were unsigned). Earlier local signed APKs and targeted DEX-prefix checks also passed. **Android Morphe Manager import on an actual phone, app launch, Gmail login, encrypted backup creation, and second-device restore remain unverified.** Treat this as a preview for controlled testing, not a guaranteed data migration.
 
@@ -35,7 +37,7 @@ Gmail official OAuth in a Morphe-re-signed FairEmail fails FairEmail's signing c
 
 1. Add this repository as a patch source using the link above.
 2. Provide an unmodified official GitHub FairEmail 1.2337a or 1.2338a APK.
-3. Select patches. The export and Pro options are disabled by default.
+3. Select patches. The export, Pro, and OAuth options are disabled by default. The changelog suppression is enabled by default.
 4. Only install the resulting APK in an **isolated test environment** with no important app data. Existing stock installation should remain untouched.
 
 This repository ships patch sources and an MPP bundle, **not** a pre-patched FairEmail APK. Preserve the original keystore of any installed Morphe-signed app for later updates.
@@ -46,4 +48,8 @@ The build uses Java 21 and the Gradle wrapper. CI checks out pinned public Morph
 
 Run `./gradlew :patches:generatePatchesList`, `python scripts/validate_morphe_metadata.py`, `python scripts/validate_morphe_bundle.py`.
 
-Version: **0.2.0 preview**. This independent project is not affiliated with FairEmail, FairCode, or Morphe. Licensed under GPL-3.0. See LICENSE.
+Dev channel: **0.2.1-dev.2 preview** with five patches. Stable main/release **v0.2.0** remains unchanged. This independent project is not affiliated with FairEmail, FairCode, or Morphe. Licensed under GPL-3.0. See LICENSE.
+
+## Changelog popup patch scope
+
+FairEmail 1.2338 has a built-in `show_changelog` setting under miscellaneous options. This Morphe patch instead forces that single preference read to `false` only in `ActivityView.checkFirst()`; existing saved settings need not be changed. It does **not** delete `CHANGELOG.md`, hide the first-run welcome dialog, disable a manually opened changelog, or change other preference reads. The 1.2338a GitHub APK DEX was inspected at `ActivityView.checkFirst()V`: the `show_changelog` const-string is immediately followed by `SharedPreferences.getBoolean` and a `move-result`. See the opt-out patch source for strict guards and rationale.
