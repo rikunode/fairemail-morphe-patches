@@ -52,7 +52,7 @@ def validate_asset(asset: dict, index: dict) -> None:
         "Enable local settings export (experimental)",
         "Enable local Pro features (experimental)",
     }
-    if bundle_version in {"0.2.1-dev.1", "0.2.1-dev.2"}:
+    if bundle_version in {"0.2.1-dev.1", "0.2.1-dev.2", "0.2.1-dev.3"}:
         names.add("Enable OAuth setup in re-signed FairEmail (experimental)")
     if bundle_version in {"0.2.1-dev.2", "0.2.1-dev.3"}:
         names.add("Suppress automatic changelog popup")
