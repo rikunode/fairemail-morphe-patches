@@ -23,6 +23,7 @@ PATCHES = {
 }
 CLONE = {"Clone FairEmail alongside official app": ("CloneFairEmailPatchKt", True, ("1.2338",))}
 DEV3 = "0.2.1-dev.3"
+SIX_PATCH_VERSIONS = frozenset({"0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"})
 SOURCE_DIR = ROOT / "patches" / "src" / "main" / "kotlin" / "dev" / "rikunode" / "fairemail"
 IGNORED_EXTENSIONS = {".apk", ".backup", ".jks", ".keystore", ".p12", ".pfx", ".pem", ".key"}
 
@@ -30,7 +31,7 @@ IGNORED_EXTENSIONS = {".apk", ".backup", ".jks", ".keystore", ".p12", ".pfx", ".
 def verify_index(index: dict, version: str) -> None:
     if not isinstance(index, dict) or index.get("version") != version:
         raise ValueError("Bundle/index version mismatch")
-    expected = PATCHES | CLONE if version == DEV3 else PATCHES
+    expected = PATCHES | CLONE if version in SIX_PATCH_VERSIONS else PATCHES
     patches = index.get("patches")
     if not isinstance(patches, list) or len(patches) != len(expected):
         raise ValueError(f"Expected exactly {len(expected)} patches in release candidate")
@@ -89,7 +90,7 @@ def verify_bundle(path: Path) -> None:
     validate_morphe_bundle(path)
     with zipfile.ZipFile(path) as archive:
         dexs = b"".join(archive.read(name) for name in archive.namelist() if name.endswith(".dex"))
-    expected = PATCHES | CLONE if path.stem.endswith(DEV3) else PATCHES
+    expected = PATCHES | CLONE if any(path.stem.endswith(item) for item in SIX_PATCH_VERSIONS) else PATCHES
     for label, (classname, _, _) in expected.items():
         if classname.encode() not in dexs or label.encode() not in dexs:
             raise ValueError(f"Compiled Android bundle lacks advertised patch: {label}")
@@ -109,7 +110,7 @@ def main() -> None:
     verify_tracked_assets()
     if args.bundle:
         verify_bundle(args.bundle)
-    print("FAIREMAIL_RELEASE_PREFLIGHT_PASS:", version, len(PATCHES | CLONE if version == DEV3 else PATCHES), "patches", "bundle" if args.bundle else "metadata")
+    print("FAIREMAIL_RELEASE_PREFLIGHT_PASS:", version, len(PATCHES | CLONE if version in SIX_PATCH_VERSIONS else PATCHES), "patches", "bundle" if args.bundle else "metadata")
 
 
 if __name__ == "__main__":
