@@ -1,4 +1,4 @@
-name: Publish FairEmail Morphe v0.3.1 stable
+name: Publish FairEmail Patches v0.3.1 stable
 on:
   push:
     branches: [main]
@@ -154,7 +154,7 @@ jobs:
           sha256sum "patches/build/libs/patches-$VERSION.mpp" | tee "$RUNNER_TEMP/STABLE_SHA256.txt"
           gh release create "$TAG" "patches/build/libs/patches-$VERSION.mpp" \
             --target "$GITHUB_SHA" \
-            --title "FairEmail Morphe $TAG — Unofficial Stable Patch Bundle" \
+            --title "FairEmail Patches $TAG — Unofficial Stable Patch Bundle" \
             --notes-file docs/RELEASE_NOTES_0.3.1.md \
             --latest
           gh release view "$TAG" --json tagName,isPrerelease,assets | python3 -c \
