@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-28T20:59:28",
-  "description": "Unofficial FairEmail Morphe development preview: four patches including opt-in OAuth setup for re-signed FairEmail 1.2338. Gmail OAuth real-device authentication is unverified.",
-  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.2.1-dev.1/patches-0.2.1-dev.1.mpp",
+  "created_at": "2026-10-29T05:05:56",
+  "description": "Unofficial FairEmail Morphe development preview: five patches including opt-in OAuth setup and automatic changelog suppression for FairEmail 1.2338. Gmail OAuth account addition and inbound mail observed; SMTP and token refresh unverified.",
+  "download_url": "https://github.com/rikunode/fairemail-morphe-patches/releases/download/v0.2.1-dev.2/patches-0.2.1-dev.2.mpp",
   "signature_download_url": "",
-  "version": "0.2.1-dev.1"
+  "version": "0.2.1-dev.2"
 }

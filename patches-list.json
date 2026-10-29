@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "0.2.1-dev.1",
+  "version": "0.2.1-dev.2",
   "patches": [
     {
       "name": "Enable OAuth setup in re-signed FairEmail (experimental)",
@@ -145,6 +145,37 @@
               "minSdk": null,
               "description": null
             },
+            {
+              "version": "1.2338",
+              "versionCodes": {
+                "ARM64_V8A": 2338,
+                "ARMEABI_V7A": 2338,
+                "X86_64": 2338,
+                "X86": 2338
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Suppress automatic changelog popup",
+      "description": "Prevent the startup changelog pop-up without deleting the changelog or changing the first-run welcome dialog.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "eu.faircode.email",
+          "name": "FairEmail",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#157B9B",
+          "signatures": null,
+          "targets": [
             {
               "version": "1.2338",
               "versionCodes": {
