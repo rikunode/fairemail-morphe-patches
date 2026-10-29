@@ -5,7 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from verify_release_candidate import PATCHES, verify_index
+from verify_release_candidate import PATCHES, CLONE, DEV3, verify_index
 
 
 class ReleaseReadinessTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class ReleaseReadinessTests(unittest.TestCase):
 
     def test_index_matches_exact_release_set(self):
         verify_index(self.index, self.asset["version"])
-        self.assertEqual(len(self.index["patches"]), 5)
+        self.assertEqual(len(self.index["patches"]), 6 if self.asset["version"] == DEV3 else 5)
 
     def test_cannot_drop_changelog_suppression(self):
         idx = copy.deepcopy(self.index)
@@ -49,8 +49,28 @@ class ReleaseReadinessTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unsafe default"):
             verify_index(idx, self.asset["version"])
 
+    def test_clone_is_on_and_targeted_only_for_dev3(self):
+        idx = copy.deepcopy(self.index)
+        idx["version"] = DEV3
+        clone = {
+            "name": "Clone FairEmail alongside official app",
+            "default": True,
+            "compatiblePackages": [{
+                "packageName": "eu.faircode.email",
+                "targets": [{"version": "1.2338",
+                    "versionCodes": {name: 2338 for name in ("ARM", "ARM64_V8A", "X86", "X86_64")}}],
+            }],
+        }
+        idx["patches"] = [p for p in idx["patches"] if p["name"] != clone["name"]]
+        idx["patches"].append(clone)
+        verify_index(idx, DEV3)
+        clone["default"] = False
+        with self.assertRaisesRegex(ValueError, "unsafe default"):
+            verify_index(idx, DEV3)
+
     def test_known_patch_count(self):
         self.assertEqual(len(PATCHES), 5)
+        self.assertEqual(len(CLONE), 1)
 
 
 if __name__ == "__main__":
