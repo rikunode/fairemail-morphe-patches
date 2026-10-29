@@ -149,10 +149,12 @@ val cloneFairEmailPatch = resourcePatch(
                     require(originalAuthorities.isNotBlank()) {
                         "Clone FairEmail: provider authority missing"
                     }
+                    // Preserve upstream Morphe's exact fallback (including a bare
+                    // original authority): replacement + '_' + prior authority.
                     val newAuthorities = originalAuthorities.split(';').map { authority ->
                         when {
                             authority.startsWith("$original.") -> replacement + authority.removePrefix(original)
-                            authority == original -> replacement
+                            authority == original -> "${replacement}_$authority"
                             authority.startsWith("@") -> error(
                                 "Clone FairEmail: resource-based provider authority requires review"
                             )
