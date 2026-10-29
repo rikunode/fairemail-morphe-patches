@@ -19,9 +19,9 @@ Audit date: 2026-10-29 JST. Target: **the independent Morphe patch bundle**, not
 
 | Feature | Status | Evidence / limitation |
 |---|---|---|
-| Source distribution via Morphe Android | VERIFIED | User screenshot of four patches recognized; dev .2 remote metadata verified for five patches |
-| Kotlin compile and Android .mpp build (five patches) | VERIFIED | GitHub Actions run 40821254754 completed successfully |
-| Integrated clone (sixth patch, compiled/installed) | PENDING | Source transplanted with GPLv3 notices and default `.morphe` suffix; device package/signer identity and provider authority compatibility still require regression tests |
+| Source distribution via Morphe Android | VERIFIED FOR PREVIOUS BUILD | User screenshot of older source recognized. New dev.3 six-patch index and GitHub Release URL verified remotely; Android Manager on-device dev.3 refresh still pending |
+| Kotlin compile, Android .mpp build and exact six-patch APK application | VERIFIED | GitHub Actions run 40826756073: compiled, all six patches applied to hashed 1.2338a APK, rebuilt unsigned APK, package name checked |
+| Integrated clone (sixth patch, compiled/rebuilt) | VERIFIED CI / DEVICE PENDING | Manifest package `eu.faircode.email.morphe`; all four provider authorities match original Morphe Clone app v1.48.0 in CI. Device update/signing-key continuity still untested |
 | Google consent and Gmail account-added dialog on modified build | VERIFIED UI | User-supplied Android screenshots, 2026-10-29 |
 | Reading a newly received Gmail email from another account | VERIFIED UI | User-supplied FairEmail screenshot plus Gmail connector send and inbox read-back, 2026-10-29 |
 | Password-backed settings export produced a nonempty file | VERIFIED FILE | User attached a 14,336-byte .backup; binary header/entropy and length match encrypted backup format, no decryption attempted |
@@ -32,7 +32,7 @@ Audit date: 2026-10-29 JST. Target: **the independent Morphe patch bundle**, not
 | Changelog popup hidden on first eligible startup | NOT YET VERIFIED | Compiled and published patch only; user has not confirmed on-device behavior for dev .2 |
 | Entire local Pro feature suite | NOT YET VERIFIED | Both Pro and export-only patches were previously selected; export success cannot isolate the global Pro check |
 | Other Gmail / Outlook OAuth providers or Android variants | NOT YET VERIFIED | Tested path is Gmail on the supplied build |
-| Exact five-patch application to pristine pinned APK, unsigned rebuilt APK integrity | NOT YET VERIFIED BY CI | Build and DEX-index validation do not execute a full patch application |
+| Exact six-patch application to pristine pinned APK, unsigned rebuilt APK integrity | VERIFIED CI | All six applied and APK ZIP/build/manifest passed in GitHub Actions 40826756073 |
 
 ## P0 release gates — must pass before changing the default stable source
 
@@ -41,7 +41,7 @@ Audit date: 2026-10-29 JST. Target: **the independent Morphe patch bundle**, not
 3. Test refresh after the existing access token expires (typically ~1 hour or greater), app restart, and another delayed sync; verify no reauthorization required. Repeat on the destination device.
 4. Test updating the installed clone with the **same signing certificate** and **same package name**, without uninstalling/clearing data, while retaining accounts and the new token. Do not copy private signing keys into the repository.
 5. Confirm the published six-patch development bundle suppresses the *automatic* changelog dialog after the appropriate first-run/version transition; confirm the manual changelog is still available.
-6. Run end-to-end application test on the exact upstream 1.2338a GitHub APK (SHA-256 `666b9f4ada53f69199355f1ccc2bed73e01fa23786fc0189cf81cc51932dc5a9`), applying the six integrated patches **without** Morphe's separate Clone app. Compare built-in vs older external Clone app results (manifest package, permissions, provider authorities), then install/update with the **same signing key** and check the accounts remain available.
+6. **CI PASS:** All six patches applied to the exact hashed upstream 1.2338a APK and rebuilt successfully; package name and four provider authorities matched pinned upstream Morphe Clone app. **Still required:** install/update the new built-in-clone APK on a device with the **same signing key**, retain accounts, confirm Gmail mail/token behavior, and verify any device permissions/provider edge cases.
 7. Capture the release permissions provenance privately (user reports upstream developer and Google consent for the intended OAuth use). Do not publish private correspondence or claim that a client ID alone demonstrates permission.
 
 ## P1 tests and hardening
@@ -67,7 +67,7 @@ FairEmail 1.2338 exports a JSON object including account and identity records, r
 ## Release artifact and channel design
 
 - **main**: stable `v0.2.0` remains unchanged while gates are open.
-- **dev**: currently published `v0.2.1-dev.2`, five patches, `patches-bundle.json` and `patches-list.json` agree. Proposed next preview `v0.2.1-dev.3` includes **sixth integrated clone** and is not yet production-verified.
+- **dev**: published `v0.2.1-dev.3`, six patches; GitHub source metadata and release asset agree. The integrated clone is APK-smoke-tested but **not yet data-preserving device-update verified**.
 - **release/readiness-0.3.0**: documentation and tests for the next stable candidate, NOT an announcement of a completed release.
 - Candidate target name: `v0.3.0-rc.1`. Produce a *draft* or isolated candidate first; do not silently replace stable `main`.
 - Ship the **.mpp patch bundle and source**, not a pre-signed FairEmail APK or user-specific backup.
@@ -75,6 +75,15 @@ FairEmail 1.2338 exports a JSON object including account and identity records, r
 - Preserve version pinning; avoid rewriting a published tag or release asset. Test Morphe Android index loading, not only JVM/Gradle compilation.
 - Confirm API use is covered by permissions before advertising widespread public Gmail OAuth compatibility; the user's stated permission is not independently verifiable from repository contents.
 
+## Latest independently reproduced build evidence
+
+- GitHub Actions: https://github.com/rikunode/fairemail-morphe-patches/actions/runs/40826756073 — PASS.
+- Upstream original: FairEmail 1.2338a APK SHA-256 `666b9f4ada53f69199355f1ccc2bed73e01fa23786fc0189cf81cc51932dc5a9`.
+- Official comparison: Morphe patches v1.48.0 MPP SHA-256 `82bc696c94c26dbf75242b59980251315145457575b663200b981ca351e1c0f7`.
+- Integrated built APK: six patches applied, unsigned ZIP validated, package `eu.faircode.email.morphe`.
+- Provider authority parity: `eu.faircode.email.morphe.androidx-startup`, `eu.faircode.email.morphe.cropper.fileprovider`, `eu.faircode.email.morphe_androidx.car.app.connection`, `eu.faircode.email.morphe_eu.faircode.email`.
+- GitHub pre-release: https://github.com/rikunode/fairemail-morphe-patches/releases/tag/v0.2.1-dev.3 — MPP 67,313 bytes, SHA-256 `056d79b358e44d58d0c033a76194d12a2d12ec211bb3ffadd4b647246173afb1`.
+
 ## Go / no-go
 
-**Current status: RELEASE CANDIDATE PREPARATION; NOT STABLE-READY.** Account import is user-confirmed, but imported sync, outbound SMTP, token refresh, clone update signing, changelog suppression on-device and six-patch APK application and integrated clone compatibility still require evidence. Do not convert these to PASS based on static tests or a successful MPP build.
+**Current status: RELEASE CANDIDATE PREPARATION; NOT STABLE-READY.** Account import is user-confirmed, but imported sync, outbound SMTP, token refresh, clone update signing, changelog suppression on-device and integrated-clone device update and sustained OAuth behavior still require evidence. Do not convert these to PASS based on static tests or a successful MPP build.
