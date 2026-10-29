@@ -23,7 +23,7 @@ PATCHES = {
 }
 CLONE = {"Clone FairEmail alongside official app": ("CloneFairEmailPatchKt", True, ("1.2338",))}
 DEV3 = "0.2.1-dev.3"
-SIX_PATCH_VERSIONS = frozenset({"0.2.1-dev.3", "0.3.0-rc.1", "0.3.0"})
+SIX_PATCH_VERSIONS = frozenset({"0.2.1-dev.3", "0.3.0-rc.1", "0.3.0", "0.3.1"})
 SOURCE_DIR = ROOT / "patches" / "src" / "main" / "kotlin" / "dev" / "rikunode" / "fairemail"
 IGNORED_EXTENSIONS = {".apk", ".backup", ".jks", ".keystore", ".p12", ".pfx", ".pem", ".key"}
 
