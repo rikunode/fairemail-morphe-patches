@@ -21,6 +21,8 @@ PATCHES = {
     "Enable OAuth setup in re-signed FairEmail (experimental)": ("EnableOAuthForResignedApkPatchKt", False, ("1.2338",)),
     "Suppress automatic changelog popup": ("SuppressAutomaticChangelogPatchKt", True, ("1.2338",)),
 }
+CLONE = {"Clone FairEmail alongside official app": ("CloneFairEmailPatchKt", True, ("1.2338",))}
+DEV3 = "0.2.1-dev.3"
 SOURCE_DIR = ROOT / "patches" / "src" / "main" / "kotlin" / "dev" / "rikunode" / "fairemail"
 IGNORED_EXTENSIONS = {".apk", ".backup", ".jks", ".keystore", ".p12", ".pfx", ".pem", ".key"}
 
@@ -28,15 +30,16 @@ IGNORED_EXTENSIONS = {".apk", ".backup", ".jks", ".keystore", ".p12", ".pfx", ".
 def verify_index(index: dict, version: str) -> None:
     if not isinstance(index, dict) or index.get("version") != version:
         raise ValueError("Bundle/index version mismatch")
+    expected = PATCHES | CLONE if version == DEV3 else PATCHES
     patches = index.get("patches")
-    if not isinstance(patches, list) or len(patches) != len(PATCHES):
-        raise ValueError(f"Expected exactly {len(PATCHES)} patches in release candidate")
-    if {x.get("name") for x in patches} != set(PATCHES):
+    if not isinstance(patches, list) or len(patches) != len(expected):
+        raise ValueError(f"Expected exactly {len(expected)} patches in release candidate")
+    if {x.get("name") for x in patches} != set(expected):
         raise ValueError("Patch names differ from the reviewed release set")
 
     for entry in patches:
         name = entry["name"]
-        classname, expected_default, versions = PATCHES[name]
+        classname, expected_default, versions = expected[name]
         if entry.get("default") is not expected_default:
             raise ValueError(f"{name}: unsafe default")
         packages = entry.get("compatiblePackages")
@@ -86,7 +89,8 @@ def verify_bundle(path: Path) -> None:
     validate_morphe_bundle(path)
     with zipfile.ZipFile(path) as archive:
         dexs = b"".join(archive.read(name) for name in archive.namelist() if name.endswith(".dex"))
-    for label, (classname, _, _) in PATCHES.items():
+    expected = PATCHES | CLONE if path.stem.endswith(DEV3) else PATCHES
+    for label, (classname, _, _) in expected.items():
         if classname.encode() not in dexs or label.encode() not in dexs:
             raise ValueError(f"Compiled Android bundle lacks advertised patch: {label}")
 
@@ -105,7 +109,7 @@ def main() -> None:
     verify_tracked_assets()
     if args.bundle:
         verify_bundle(args.bundle)
-    print("FAIREMAIL_RELEASE_PREFLIGHT_PASS:", version, len(PATCHES), "patches", "bundle" if args.bundle else "metadata")
+    print("FAIREMAIL_RELEASE_PREFLIGHT_PASS:", version, len(PATCHES | CLONE if version == DEV3 else PATCHES), "patches", "bundle" if args.bundle else "metadata")
 
 
 if __name__ == "__main__":
