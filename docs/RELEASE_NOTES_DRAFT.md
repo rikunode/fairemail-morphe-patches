@@ -14,14 +14,14 @@ This is an independent, unofficial Morphe patch bundle for the upstream FairEmai
 
 ## Verified so far
 
-- Morphe Android recognized the patched source; five-patch development bundle built successfully.
+- Morphe Android recognized the earlier patched source; the six-patch development bundle built successfully and all six patches applied to a clean hashed FairEmail 1.2338a APK in GitHub Actions.
 - Google consent + Gmail account added on a user test phone.
 - User observed an incoming mail from a separate Gmail account using the modified app.
 - Encrypted backup export file created and an account import to a different phone reported successful.
 
 ## Not yet verified — no stable claims
 
-SMTP send from patched FairEmail, imported account *new* sync/refresh, unattended token refresh after expiration, safe in-place clone upgrades with the same key, six-patch real APK regression and integrated-clone upgrade test, automatic changelog suppression on-device.
+SMTP send from patched FairEmail, imported account *new* sync/refresh, unattended token refresh after expiration, safe in-place clone upgrades with the same key, integrated-clone **on-device upgrade** test, automatic changelog suppression on-device. **CI six-patch APK reconstruction and provider authority parity already PASS.**
 
 ## Safety notices
 
