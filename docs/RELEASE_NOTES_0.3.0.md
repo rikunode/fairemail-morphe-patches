@@ -37,6 +37,8 @@
 ## How to install
 
 1. Add `rikunode/fairemail-morphe-patches` as a Morphe patch source; get the original upstream APK and verify the hash.
+   In Morphe Manager, **switch OFF “Use prerelease patches”** so it reads stable `main` instead of the older `dev` preview. Refresh the source and confirm **0.3.0 / six patches** before patching. This does not automatically update an installed clone.
+
 2. Confirm the built-in clone patch is ON; turn the external Morphe universal Clone app OFF.
 3. Decide whether to enable experimental OAuth, local Pro and export functions.
 4. Patch the **original** APK using Morphe Manager. If updating an existing clone, **confirm the package and signing certificate match** before attempting a data-preserving update; `scripts/check_clone_upgrade.py` provides a read-only preflight.
